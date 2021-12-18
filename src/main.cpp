@@ -68,10 +68,10 @@ struct Piece
     }
 };
 
-vector<vector<Piece>> initBoardState()
+typedef vector<vector<Piece>> State;
+State initBoardState()
 {
-    vector<vector<Piece>> st;
-    st =
+    State st =
     {
         {
             Piece(ROOK, true),
@@ -107,7 +107,8 @@ vector<vector<Piece>> initBoardState()
                  Piece(NONE)
             });
     }
-    st.push_back({
+    st.push_back
+    ({
         Piece(PAWN, false),
         Piece(PAWN, false),
         Piece(PAWN, false),
@@ -117,8 +118,8 @@ vector<vector<Piece>> initBoardState()
         Piece(PAWN, false),
         Piece(PAWN, false)
     });
-    st.push_back(
-    {
+    st.push_back
+    ({
         Piece(ROOK, false),
         Piece(KNIGHT, false),
         Piece(BISHOP, false),
@@ -132,13 +133,42 @@ vector<vector<Piece>> initBoardState()
 }
 
 bool whiteTurn = true;
-bool whiteInCheck = false;
-bool blackInCheck = false;
 
-vector<vector<Piece>> state = initBoardState();
+State state = initBoardState();
 
 Position cursor = { 0, 0 };
 optional<Position> currentMove = nullopt;
+
+bool inCheck(bool whitePlayer, State st)
+{
+    for (int i = 0; i < state.size(); i++)
+    {
+        for (int j = 0; j < state.size(); j++)
+        {
+            Position begin = { i, j };
+            auto piece = state[i][j];
+            if (piece.kind != NONE && piece.isWhite != whiteTurn)
+            {
+                for (int i2 = 0; i2 < state.size(); i2++)
+                {
+                    for (int j2 = 0; j2 < state.size(); j2++)
+                    {
+                        if (
+                            state[i2][j2].isWhite == whiteTurn &&
+                            state[i2][j2].kind == KING &&
+                            validateMoveBegin(begin) &&
+                            validateMoveEnd(begin, { i2, j2 }))
+                        {
+                            return true;
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    return false;
+}
 
 void printBoard() 
 {
@@ -212,9 +242,36 @@ bool validateMoveBegin(Position begin)
 bool validatePawnMoveEnd(Position begin, Position end) 
 {
     Position delta = makeDelta(begin, end);
-    Position absDelta = { abs(delta.first), abs(delta.second) };
 
-    return true;
+    int direction = whiteTurn ? 1 : -1;
+
+    // Pawn moves diagonally to take an enemy piece
+    if (
+            delta.first == direction &&
+            (delta.second == 1 || delta.second == -1) &&
+            state[end.first][end.second].kind != NONE &&
+            state[end.first][end.second].isWhite != whiteTurn)
+    {
+        return true;
+    }
+
+    // Pawn moves forward once
+    else if (delta.first == direction && delta.second == 0 && state[end.first][end.second].kind == NONE)
+    {
+        return true;
+    }
+    // Pawn moves forward twice
+    else if (
+            ((whiteTurn && begin.first == 1) || (!whiteTurn && begin.first == 6)) &&
+            delta.first == 2 * direction &&
+            delta.second == 0 &&
+            state[begin.first + direction][begin.second].kind == NONE &&
+            state[end.first][end.second].kind == NONE)
+    {
+        return true;
+    }
+
+    return false;
 }
 
 bool validateKnightMoveEnd(Position begin, Position end)
@@ -264,6 +321,12 @@ bool validateBishopMoveEnd(Position begin, Position end)
     return validateNoPiecesInTheWay(begin, end, delta);
 }
 
+void movePiece(State st, Position begin, Position end)
+{
+    st[end.first][end.second] = st[begin.first][begin.second];
+    st[begin.first][begin.second] = NONE;
+}
+
 bool validateMoveEnd(Position begin, Position end)
 {
     Piece pBegin = state[begin.first][begin.second];
@@ -277,6 +340,16 @@ bool validateMoveEnd(Position begin, Position end)
     if ((pBegin.kind == KNIGHT) && !validateKnightMoveEnd(begin, end))  { return false; }
     if ((pBegin.kind == ROOK)   && !validateRookMoveEnd(begin, end))    { return false; }
 
+    State st(state);
+    movePiece(st, begin, end);
+    bool willBeInCheck = inCheck(whiteTurn, st);
+
+    // Cannot put yourself in check
+    if (willBeInCheck)
+    {
+        return false;
+    }
+
     return true;
 }
 
@@ -287,12 +360,6 @@ void printError(const char* str)
     refresh();
     move(cursor.first, cursor.second);
     getch();
-}
-
-void movePiece(Position begin, Position end)
-{
-    state[end.first][end.second] = state[begin.first][begin.second];
-    state[begin.first][begin.second] = NONE;
 }
 
 void refreshUi()
@@ -313,41 +380,54 @@ int main()
     setupColors();
     refreshUi();
 
-    char ch;
+    char ch = ' ';
 
-    while(ch != 'e') {
+    while(ch != 'e')
+    {
         ch = getch();
 
-        if (ch == 'e') {
+        if (ch == 'e')
+        {
             exitApp();
         }
-        else if (ch == 'w') {
+        else if (ch == 'w')
+        {
             cursor.first = max(0, cursor.first - 1);
         }
-        else if (ch == 'a') {
+        else if (ch == 'a')
+        {
             cursor.second = max(0, cursor.second - 1);
         }
-        else if (ch == 's') {
+        else if (ch == 's')
+        {
             cursor.first = min(7, cursor.first + 1);
         }
-        else if (ch == 'd') {
+        else if (ch == 'd')
+        {
             cursor.second = min(7, cursor.second + 1);
         }
-        else if (ch == 'm') {
-            if (!currentMove) {
-                if (!validateMoveBegin(cursor)) {
+        else if (ch == 'm')
+        {
+            if (!currentMove)
+            {
+                if (!validateMoveBegin(cursor))
+                {
                     printError("Invalid move");
                 }
-                else {
+                else
+                {
                     currentMove = cursor;
                 }
             }
-            else {
-                if (!validateMoveEnd(currentMove.value(), cursor)) {
+            else
+            {
+                if (!validateMoveEnd(currentMove.value(), cursor))
+                {
                     printError("Invalid move");
                 }
-                else {
-                    movePiece(currentMove.value(), cursor);
+                else
+                {
+                    movePiece(state, currentMove.value(), cursor);
                     whiteTurn = !whiteTurn;
                 }
                 currentMove = nullopt;
