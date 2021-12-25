@@ -7,35 +7,35 @@
 using std::string;
 using std::unordered_map;
 
-enum Kind
+enum Type
 {
-    KING,
-    QUEEN,
-    BISHOP,
-    ROOK,
-    PAWN,
-    KNIGHT,
-    NONE
+    KING = 0,
+    QUEEN = 1,
+    BISHOP = 2,
+    ROOK = 3,
+    PAWN = 4,
+    KNIGHT = 5,
+    NONE = 6
 };
 
-const unordered_map<Kind, const char *> KIND_DISPLAY_MAP =
-        {
-                {KING,   "K"},
-                {QUEEN,  "Q"},
-                {BISHOP, "B"},
-                {ROOK,   "R"},
-                {PAWN,   "P"},
-                {KNIGHT, "N"},
-                {NONE,   "-"}
-        };
+const unordered_map<Type, const char *> KIND_DISPLAY_MAP =
+{
+    {KING,   "K"},
+    {QUEEN,  "Q"},
+    {BISHOP, "B"},
+    {ROOK,   "R"},
+    {PAWN,   "P"},
+    {KNIGHT, "N"},
+    {NONE,   "-"}
+};
 
 struct Piece
 {
-    Kind kind;
+    Type kind;
     bool isWhite;
 
-    Piece(Kind _kind, bool _isWhite) : kind(_kind), isWhite(_isWhite) {}
-    Piece(Kind _kind) : kind(_kind), isWhite(false) {}
+    Piece(Type _kind, bool _isWhite) : kind(_kind), isWhite(_isWhite) {}
+    Piece(Type _kind) : kind(_kind), isWhite(false) {}
 
     [[nodiscard]] const char * toString() const
     {

@@ -7,42 +7,47 @@
 bool validateMoveBegin(const State& state, const Position& begin);
 bool validateMoveEnd(const State& state, const Position& begin, const Position& end);
 
-bool inCheck(State state, bool whitePlayer)
+// Check if (`whitePlayer` ? white : black) is in check with the board
+// configured as `board`
+bool inCheck(const State& state, const Board& board)
 {
-    Board& board = state.board;
-
-    for (int i = 0; i < board.size(); i++)
-    {
-        for (int j = 0; j < board.size(); j++)
-        {
-            Position begin = { i, j };
-            auto piece = board[i][j];
-            if (piece.kind != NONE && piece.isWhite != state.isWhiteTurn)
-            {
-                for (int i2 = 0; i2 < board.size(); i2++)
-                {
-                    for (int j2 = 0; j2 < board.size(); j2++)
-                    {
-                        if (
-                                board[i2][j2].isWhite == state.isWhiteTurn &&
-                                board[i2][j2].kind == KING &&
-                                validateMoveBegin(state, begin) &&
-                                validateMoveEnd(state, begin, { i2, j2 }))
-                        {
-                            return true;
-                        }
-                    }
-                }
-            }
-        }
-    }
+//    for (int i = 0; i < board.size(); i++)
+//    {
+//        for (int j = 0; j < board.size(); j++)
+//        {
+//            const Position begin = { i, j };
+//            const Piece piece = board[i][j];
+//
+//            // For each enemy piece
+//            if (piece.kind != NONE && piece.isWhite != state.isWhiteTurn)
+//            {
+//                for (int i2 = 0; i2 < board.size(); i2++)
+//                {
+//                    for (int j2 = 0; j2 < board.size(); j2++)
+//                    {
+//                        // For each of the opposing players possible moves,
+//                        // if the move is valid and takes the current players king,
+//                        // this is a valid-checkable move
+//                        if (
+//                                board[i2][j2].isWhite == state.isWhiteTurn &&
+//                                board[i2][j2].kind == KING &&
+//                                validateMoveBegin(state, begin) &&
+//                                validateMoveEnd(state, begin, { i2, j2 }))
+//                        {
+//                            return true;
+//                        }
+//                    }
+//                }
+//            }
+//        }
+//    }
 
     return false;
 }
 
 bool validateMoveBegin(const State& state, const Position& begin)
 {
-    const Piece& p = state.board[begin.first][begin.second];
+    const Piece& p = state.pieceAt(begin);
 
     // Cannot move nothing
     if (p.kind == NONE) { return false; }
@@ -104,14 +109,12 @@ bool validateKnightMoveEnd(const State& state, const Position& begin, const Posi
 
 bool validateNoPiecesInTheWay(const State& state, const Position& begin, const Position& end, const Position& delta)
 {
-    const Board& board = state.board;
-
-    Position signs = { sign(delta.first), sign(delta.second) };
+    const Position signs = { sign(delta.first), sign(delta.second) };
     Position p = { begin.first + signs.first, begin.second + signs.second };
 
     while(p != end)
     {
-        if (board[p.first][p.second].kind != NONE) { return false; }
+        if (state.pieceAt(p).kind != NONE) { return false; }
 
         p.first += signs.first;
         p.second += signs.second;
@@ -122,7 +125,7 @@ bool validateNoPiecesInTheWay(const State& state, const Position& begin, const P
 
 bool validateRookMoveEnd(const State& state, const Position& begin, const Position& end)
 {
-    Position delta = makeDelta(begin, end);
+    const Position delta = makeDelta(begin, end);
 
     // Rook only moves along x or y. Either deltaX XOR deltaY should be non-zero
     if ((delta.first == 0) == (delta.second == 0)) { return false; }
@@ -134,8 +137,8 @@ bool validateBishopMoveEnd(const State& state, const Position& begin, const Posi
 {
     const Board& board = state.board;
 
-    Position delta = makeDelta(begin, end);
-    Position absDelta = { abs(delta.first), abs(delta.second) };
+    const Position delta = makeDelta(begin, end);
+    const Position absDelta = { abs(delta.first), abs(delta.second) };
 
     // Bishop moves along diagonals
     if (delta.first == 0 || absDelta.first != absDelta.second) { return false; }
@@ -145,10 +148,8 @@ bool validateBishopMoveEnd(const State& state, const Position& begin, const Posi
 
 bool validateMoveEnd(const State& state, const Position& begin, const Position& end)
 {
-    const Board& board = state.board;
-
-    Piece pBegin = board[begin.first][begin.second];
-    Piece pEnd = board[end.first][end.second];
+    const Piece& pBegin  = state.pieceAt(begin);
+    const Piece& pEnd    = state.pieceAt(end);
 
     // Cannot replace your own piece
     if (pEnd.kind != NONE && state.isWhiteTurn == pEnd.isWhite) { return false; }
@@ -158,11 +159,12 @@ bool validateMoveEnd(const State& state, const Position& begin, const Position& 
     if ((pBegin.kind == KNIGHT) && !validateKnightMoveEnd(state, begin, end))  { return false; }
     if ((pBegin.kind == ROOK)   && !validateRookMoveEnd(state, begin, end))    { return false; }
 
-    Board newBoard(board);
-    movePiece(newBoard, begin, end);
+    State newState;
+    newState.board = Board(state.board);
+    newState.movePiece(begin, end);
 
     // Cannot put yourself in check
-//    if (inCheck(state, true))
+//    if (inCheck(newState, newState.board))
 //    {
 //        return false;
 //    }

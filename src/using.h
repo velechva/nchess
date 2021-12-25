@@ -3,6 +3,7 @@
 
 #include <utility>
 #include <algorithm>
+#include <vector>
 #include <optional>
 
 using   std::pair,
@@ -10,6 +11,6 @@ using   std::pair,
         std::min,
         std::optional,
         std::nullopt,
-        std::vector;
-
+        std::vector,
+        std::string;
 #endif

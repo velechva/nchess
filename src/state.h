@@ -3,72 +3,13 @@
 
 typedef vector<vector<Piece>> Board;
 
+#include <stdlib.h>
+#include <iostream>
+
+#include "file.h"
+
 struct State
 {
-private:
-    static Board initBoardState()
-    {
-        Board b =
-        {
-            {
-                Piece(ROOK, true),
-                        Piece(KNIGHT, true),
-                        Piece(BISHOP, true),
-                        Piece(KING, true),
-                        Piece(QUEEN, true),
-                        Piece(BISHOP, true),
-                        Piece(KNIGHT, true),
-                        Piece(ROOK, true)
-            },
-            {
-                Piece(PAWN, true),
-                        Piece(PAWN, true),
-                        Piece(PAWN, true),
-                        Piece(PAWN, true),
-                        Piece(PAWN, true),
-                        Piece(PAWN, true),
-                        Piece(PAWN, true),
-                        Piece(PAWN, true)
-            }
-        };
-        for (int i = 0; i < 4; i++)
-        {
-            b.push_back({
-                                 Piece(NONE),
-                                 Piece(NONE),
-                                 Piece(NONE),
-                                 Piece(NONE),
-                                 Piece(NONE),
-                                 Piece(NONE),
-                                 Piece(NONE),
-                                 Piece(NONE)
-            });
-        }
-        b.push_back
-        ({
-                         Piece(PAWN, false),
-                         Piece(PAWN, false),
-                         Piece(PAWN, false),
-                         Piece(PAWN, false),
-                         Piece(PAWN, false),
-                         Piece(PAWN, false),
-                         Piece(PAWN, false),
-                         Piece(PAWN, false)
-        });
-        b.push_back
-        ({
-                         Piece(ROOK, false),
-                         Piece(KNIGHT, false),
-                         Piece(BISHOP, false),
-                         Piece(KING, false),
-                         Piece(QUEEN, false),
-                         Piece(BISHOP, false),
-                         Piece(KNIGHT, false),
-                         Piece(ROOK, false)
-        });
-
-        return b;
-    }
 public:
     Board board;
     bool isWhiteTurn;
@@ -76,17 +17,55 @@ public:
     optional<Position> currentMove;
 
     State() :
-        board(initBoardState()),
+        board(initialBoardState()),
         isWhiteTurn(true),
         cursor {0, 0},
         currentMove(nullopt)
     {}
+
+    Board initialBoardState();
+
+    void movePiece(const Position& begin, const Position& end);
+
+    [[nodiscard]] const Piece& pieceAt(const Position& p) const
+    {
+        return board[p.first][p.second];
+    }
 };
 
-void movePiece(Board& board, const Position& begin, const Position& end)
+void State::movePiece(const Position& begin, const Position& end)
 {
     board[end.first][end.second] = board[begin.first][begin.second];
     board[begin.first][begin.second] = NONE;
+}
+
+Board State::initialBoardState()
+{
+    Board board;
+
+    vector<vector<string>> boardFile = read_csv("/Users/victorvelechosky/CLionProjects/nchess/res/board.txt");
+
+    size_t i = 0;
+    size_t j = 0;
+
+    for (auto& line : boardFile)
+    {
+        vector<Piece> row;
+        for (auto& el : line) {
+            const char &c1 = el[0];
+            if (c1 == '6')
+            {
+                row.push_back(Piece(NONE));
+            }
+            else
+            {
+                row.push_back(Piece(Type(KING + atoi(&el[1])), el[0] == 'W'));
+            }
+        }
+        board.push_back(row);
+    }
+
+    return board;
 }
 
 #endif

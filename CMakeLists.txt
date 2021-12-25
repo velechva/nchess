@@ -17,6 +17,6 @@ add_executable(main
         src/ui.h
         src/util.h
         src/validate.h
-)
+        src/file.h)
 
 target_link_libraries(main ${CURSES_LIBRARIES})

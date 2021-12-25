@@ -1,6 +1,5 @@
 #include <algorithm>
 #include <optional>
-#include <vector>
 
 #include <ncurses.h>
 
@@ -70,7 +69,7 @@ int main()
                 }
                 else
                 {
-                    movePiece(state.board, state.currentMove.value(), state.cursor);
+                    state.movePiece(state.currentMove.value(), state.cursor);
                     state.isWhiteTurn = !state.isWhiteTurn;
                 }
                 state.currentMove = nullopt;
