@@ -10,13 +10,13 @@ include_directories(${CURSES_INCLUDE_DIR})
 
 add_executable(main
         src/main.cpp
-        src/types.h
+        src/model/types.h
         src/using.h
-        src/piece.h
-        src/state.h
-        src/ui.h
+        src/model/piece.h
+        src/model/state.h
+        src/ui/ui.h
         src/util.h
-        src/validate.h
-        src/file.h)
+        src/validation/validate.h
+        src/file.h src/log.h src/validation/typevalidator.h)
 
 target_link_libraries(main ${CURSES_LIBRARIES})

@@ -3,12 +3,12 @@
 
 #include <ncurses.h>
 
-#include "types.h"
+#include "model/types.h"
 
-#include "piece.h"
-#include "state.h"
-#include "ui.h"
-#include "validate.h"
+#include "model/piece.h"
+#include "model/state.h"
+#include "ui/ui.h"
+#include "validation/validate.h"
 
 int main()
 {

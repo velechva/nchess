@@ -6,7 +6,7 @@ typedef vector<vector<Piece>> Board;
 #include <stdlib.h>
 #include <iostream>
 
-#include "file.h"
+#include "../file.h"
 
 struct State
 {
@@ -21,6 +21,13 @@ public:
         isWhiteTurn(true),
         cursor {0, 0},
         currentMove(nullopt)
+    {}
+
+    State(const State& other) :
+        board(Board(other.board)),
+        isWhiteTurn(other.isWhiteTurn),
+        cursor(Position(other.cursor)),
+        currentMove(optional(other.currentMove))
     {}
 
     Board initialBoardState();
