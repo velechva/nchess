@@ -7,4 +7,4 @@
 
 std::ofstream logFile("/Users/victorvelechosky/CLionProjects/nchess/log.out", std::ios_base::out | std::ios_base::app);
 
-#endif //NCHESS_LOG_H
+#endif

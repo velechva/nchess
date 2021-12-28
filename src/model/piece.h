@@ -18,7 +18,7 @@ enum Type
     NONE = 6
 };
 
-const unordered_map<Type, const char *> KIND_DISPLAY_MAP =
+static unordered_map<Type, const char *> KIND_DISPLAY_MAP =
 {
     {KING,   "K"},
     {QUEEN,  "Q"},

@@ -35,9 +35,9 @@ void printBoard(const State& state)
 {
     auto board = state.board;
 
-    for (auto & i : board)
+    for (auto& i : board)
     {
-        for (auto & j : i)
+        for (auto& j : i)
         {
             if (j.kind == NONE)
             {
