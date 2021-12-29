@@ -63,7 +63,7 @@ int main()
             }
             else
             {
-                if (!validateMoveEnd(state, state.currentMove.value(), state.cursor))
+                if (!validateMoveEnd(state, state.currentMove.value(), state.cursor, true))
                 {
                     printError(state, "Invalid move");
                 }
@@ -71,6 +71,15 @@ int main()
                 {
                     state.movePiece(state.currentMove.value(), state.cursor);
                     state.isWhiteTurn = !state.isWhiteTurn;
+
+                    State newState(state);
+                    if (inCheckMate(newState))
+                    {
+                        printWinner(!state.isWhiteTurn);
+                        getch();
+                        exitApp();
+                    }
+
                 }
                 state.currentMove = nullopt;
             }

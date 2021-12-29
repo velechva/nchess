@@ -22,11 +22,16 @@ void printControls()
     printw("w: up, a: left, s: down, d: right, m: move, e: exit\n");
 }
 
-void printError(const State& state, const char* str)
+void printMessage(const char* str)
 {
     move(12, 0);
     printw(str);
     refresh();
+}
+
+void printError(const State& state, const char* str)
+{
+    printMessage(str);
     move(state.cursor.first, state.cursor.second);
     getch();
 }
@@ -59,6 +64,14 @@ void printBoard(const State& state)
         printw("\n");
     }
     printw("\n\n");
+}
+
+void printWinner(const bool winnerIsWhite)
+{
+    string winnerStr = winnerIsWhite ? "White" : "Black";
+    winnerStr += " wins. Press any key to exit";
+    printMessage(winnerStr.c_str());
+    refresh();
 }
 
 void refreshUi(const State& state)
