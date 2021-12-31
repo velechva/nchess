@@ -1,127 +1,142 @@
 #ifndef NCHESS_TYPEVALIDATOR_H
 #define NCHESS_TYPEVALIDATOR_H
 
-typedef std::function<bool(const State&, const Position&, const Position&)> Validator;
+#include "../util.h"
 
-bool validateNoBlockingPieces(const State& state, const Position& begin, const Position& end, const Position& delta)
-{
-    const Position signs = { sign(delta.first), sign(delta.second) };
-    Position p = { begin.first + signs.first, begin.second + signs.second };
+namespace nchess::validation {
+    typedef std::function<bool(
+            const nchess::model::State &,
+            const nchess::model::Position &,
+            const nchess::model::Position &
+    )> Validator;
 
-    while(p != end)
-    {
-        if (state.pieceAt(p).kind != NONE) { return false; }
+    bool validateNoBlockingPieces(const nchess::model::State &state, const nchess::model::Position &begin,
+                                  const nchess::model::Position &end, const nchess::model::Position &delta) {
+        const nchess::model::Position signs = nchess::util::sign(delta);
+        nchess::model::Position p = nchess::util::sum(begin, signs);
 
-        p.first += signs.first;
-        p.second += signs.second;
+        while (p != end) {
+            if (state.pieceAt(p).kind != nchess::model::NONE) { return false; }
+
+            p.first += signs.first;
+            p.second += signs.second;
+        }
+
+        return true;
     }
 
-    return true;
-}
+    bool validateRook(const nchess::model::State &state, const nchess::model::Position &begin,
+                      const nchess::model::Position &end) {
+        const nchess::model::Position delta = nchess::util::difference(begin, end);
 
-bool validateRook(const State& state, const Position& begin, const Position& end)
-{
-    const Position delta = makeDelta(begin, end);
+        // Rook only moves along x or y. Either deltaX XOR deltaY should be non-zero
+        if ((delta.first == 0) == (delta.second == 0)) { return false; }
 
-    // Rook only moves along x or y. Either deltaX XOR deltaY should be non-zero
-    if ((delta.first == 0) == (delta.second == 0)) { return false; }
+        return validateNoBlockingPieces(state, begin, end, delta);
+    }
 
-    return validateNoBlockingPieces(state, begin, end, delta);
-}
+    bool validateBishop(const nchess::model::State &state, const nchess::model::Position &begin,
+                        const nchess::model::Position &end) {
+        const nchess::model::Board &board = state.board;
 
-bool validateBishop(const State& state, const Position& begin, const Position& end)
-{
-    const Board& board = state.board;
+        const nchess::model::Position delta = nchess::util::difference(begin, end);
+        const nchess::model::Position absDelta = {abs(delta.first), abs(delta.second)};
 
-    const Position delta = makeDelta(begin, end);
-    const Position absDelta = { abs(delta.first), abs(delta.second) };
+        // Bishop moves along diagonals
+        if (delta.first == 0 || absDelta.first != absDelta.second) { return false; }
 
-    // Bishop moves along diagonals
-    if (delta.first == 0 || absDelta.first != absDelta.second) { return false; }
+        return validateNoBlockingPieces(state, begin, end, delta);
+    }
 
-    return validateNoBlockingPieces(state, begin, end, delta);
-}
+    bool validateKnight(const nchess::model::State &state, const nchess::model::Position &begin,
+                        const nchess::model::Position &end) {
+        nchess::model::Position delta = nchess::util::difference(begin, end);
 
-bool validateKnight(const State& state, const Position& begin, const Position& end)
-{
-    Position delta = makeDelta(begin, end);
+        // Knights must move in L shapes
+        return (
+                (abs(delta.first) == 1 && abs(delta.second) == 2) ||
+                (abs(delta.first) == 2 && abs(delta.second) == 1));
+    }
 
-    // Knights must move in L shapes
-    return (
-            (abs(delta.first) == 1 && abs(delta.second) == 2) ||
-            (abs(delta.first) == 2 && abs(delta.second) == 1));
-}
+    bool validateQueen(const nchess::model::State &state, const nchess::model::Position &begin,
+                       const nchess::model::Position &end) {
+        // Queen can move either like a bishop or a rook
+        return validateRook(state, begin, end) || validateBishop(state, begin, end);
+    }
 
-bool validateQueen(const State& state, const Position& begin, const Position& end)
-{
-    // Queen can move either like a bishop or a rook
-    return validateRook(state, begin, end) || validateBishop(state, begin, end);
-}
-
-bool validateKing(const State& state, const Position& begin, const Position& end)
-{
-    Position delta = makeDelta(begin, end);
-    vector<Position> kingDeltas =
-    {
-            {-1,0},{0,-1},{1,0},{0,1},{1,1},{-1,-1},{1,-1},{-1,1}
+    static std::vector<nchess::model::Position> KING_DELTAS = {
+            {-1, 0},
+            {0,  -1},
+            {1,  0},
+            {0,  1},
+            {1,  1},
+            {-1, -1},
+            {1,  -1},
+            {-1, 1}
     };
 
-    for (auto& allowed : kingDeltas)
-    {
-        if (allowed == delta) { return true; }
+    bool validateKing(const nchess::model::State &state, const nchess::model::Position &begin,
+                      const nchess::model::Position &end) {
+        nchess::model::Position delta = nchess::util::difference(begin, end);
+
+        for (auto &allowed: KING_DELTAS) {
+            if (allowed == delta) { return true; }
+        }
+
+        return false;
     }
 
-    return false;
-}
+    bool validatePawn(const nchess::model::State &state, const nchess::model::Position &begin,
+                      const nchess::model::Position &end) {
+        const nchess::model::Board &board = state.board;
 
-bool validatePawn(const State& state, const Position& begin, const Position& end)
-{
-    const Board& board = state.board;
+        const nchess::model::Position delta = nchess::util::difference(begin, end);
 
-    const Position delta = makeDelta(begin, end);
+        int direction = state.isWhiteTurn ? 1 : -1;
 
-    int direction = state.isWhiteTurn ? 1 : -1;
-
-    // Pawn moves diagonally to take an enemy piece
-    if (
-            delta.first == direction &&
-            (delta.second == 1 || delta.second == -1) &&
-            board[end.first][end.second].kind != NONE &&
-            board[end.first][end.second].isWhite != state.isWhiteTurn)
-    {
-        return true;
-    }
+        // Pawn moves diagonally to take an enemy piece
+        if (
+                delta.first == direction &&
+                (delta.second == 1 || delta.second == -1) &&
+                board[end.first][end.second].kind != nchess::model::NONE &&
+                board[end.first][end.second].isWhite != state.isWhiteTurn)
+        {
+            return true;
+        }
 
         // Pawn moves forward once
-    else if (
-            delta.first == direction &&
-            delta.second == 0 &&
-            board[end.first][end.second].kind == NONE)
-    {
-        return true;
-    }
+        else if (
+                delta.first == direction &&
+                delta.second == 0 &&
+                board[end.first][end.second].kind == nchess::model::NONE)
+        {
+            return true;
+        }
+
         // Pawn moves forward twice
-    else if (
-            ((state.isWhiteTurn && begin.first == 1) || (!state.isWhiteTurn && begin.first == 6)) &&
-            delta.first == 2 * direction &&
-            delta.second == 0 &&
-            board[begin.first + direction][begin.second].kind == NONE &&
-            board[end.first][end.second].kind == NONE)
-    {
-        return true;
+        else if (
+                ((state.isWhiteTurn && begin.first == 1) || (!state.isWhiteTurn && begin.first == 6)) &&
+                delta.first == 2 * direction &&
+                delta.second == 0 &&
+                board[begin.first + direction][begin.second].kind == nchess::model::NONE &&
+                board[end.first][end.second].kind == nchess::model::NONE)
+        {
+            return true;
+        }
+
+        // En passant TODO
+
+        return false;
     }
 
-    return false;
+    const std::unordered_map<nchess::model::Type, Validator> TYPE_VALIDATORS = {
+        {nchess::model::ROOK,   validateRook},
+        {nchess::model::BISHOP, validateBishop},
+        {nchess::model::KNIGHT, validateKnight},
+        {nchess::model::PAWN,   validatePawn},
+        {nchess::model::QUEEN,  validateQueen},
+        {nchess::model::KING,   validateKing}
+    };
 }
-
-const unordered_map<Type, Validator> TYPE_VALIDATORS =
-{
-                { ROOK,     validateRook    },
-                { BISHOP,   validateBishop  },
-                { KNIGHT,   validateKnight  },
-                { PAWN,     validatePawn    },
-                { QUEEN,    validateQueen   },
-                { KING,     validateKing    }
-};
 
 #endif

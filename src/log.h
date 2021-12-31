@@ -3,8 +3,8 @@
 
 #include <fstream>
 
-#include "using.h"
-
-std::ofstream logFile("/Users/victorvelechosky/CLionProjects/nchess/log.out", std::ios_base::out | std::ios_base::app);
+namespace nchess::log {
+    static std::ofstream debug("/Users/victorvelechosky/CLionProjects/nchess/debug.log", std::ios_base::out | std::ios_base::app);
+}
 
 #endif

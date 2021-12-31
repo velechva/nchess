@@ -1,48 +1,78 @@
 #ifndef NCHESS_UTIL_H
 #define NCHESS_UTIL_H
 
-int sign(int delta)
-{
-    if (delta == 0) { return 0; }
-    return delta > 0 ? 1 : -1;
-}
+#include <vector>
+#include <string>
+#include <optional>
 
-vector<string> split(const string& str, const char& delimiter)
-{
-    string padStr = str + delimiter;
+#include "log.h"
 
-    vector<string> output;
-    size_t begin = 0;
-    size_t end   = 0;
+namespace nchess::util {
+    /**
+     * Sign function
+     *
+     * @return val < 0 ? -1 : 1
+     */
+    template<typename T>
+    int sign(T val) {
+        if (val < 0) { return -1; }
+        if (val > 0) { return  1; }
 
-    while (end < padStr.size())
-    {
-        const char& c = padStr.at(end);
-
-        if (c == delimiter && end > begin)
-        {
-            output.push_back(padStr.substr(begin, end - begin));
-        }
-        if (c == delimiter)
-        {
-            begin = ++end;
-        }
-        else
-        {
-            end++;
-        }
+        return 0;
     }
 
-    return output;
-}
+    /**
+     * Apply Sign function to both parameters in a pair
+     */
+    template<typename T>
+    std::pair<T, T> sign(const std::pair<T, T>& pair) {
+        return {
+                sign(pair.first),
+                sign(pair.second)
+        };
+    }
 
-Position makeDelta(const Position& begin, const Position& end)
-{
-    return
-    {
-        end.first - begin.first,
-        end.second - begin.second
-    };
+    /**
+     * Split a string into tokens
+     *
+     * @return an array of tokens from `str` delimited by `delimeter`
+     */
+    std::vector<std::string> split(const std::string &str, const char &delimiter);
+
+    /**
+     * Calculate difference between two pairs
+     * @return end - begin
+     */
+    template<typename T>
+    std::pair<T, T> difference(const std::pair<T, T> &begin, const std::pair<T, T> &end) {
+        return {
+                end.first  - begin.first,
+                end.second - begin.second
+        };
+    }
+
+    /**
+     * Calculate addition between two pairs
+     * @return begin + end
+     */
+     template<typename T>
+     std::pair<T, T> sum(const std::pair<T, T>& begin, const std::pair<T, T> &end) {
+        return {
+                end.first  + begin.first,
+                end.second + begin.second
+        };
+     }
+
+     template<typename T>
+     T unwrapOrExit(std::optional<T> opt, const char * exitMessage) {
+         if (opt) {
+             return opt.value();
+         }
+         else {
+             nchess::log::debug << exitMessage << "\n";
+             exit(1);
+         }
+     }
 }
 
 #endif
