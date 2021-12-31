@@ -18,13 +18,13 @@ int main() {
         if (ch == 'e') {
             nchess::ui::exit();
         } else if (ch == 'w') {
-            state.cursor.first = std::max(0, state.cursor.first - 1);
+            state.moveCursor(nchess::model::UP);
         } else if (ch == 'a') {
-            state.cursor.second = std::max(0, state.cursor.second - 1);
+            state.moveCursor(nchess::model::LEFT);
         } else if (ch == 's') {
-            state.cursor.first = std::min(7, state.cursor.first + 1);
+            state.moveCursor(nchess::model::DOWN);
         } else if (ch == 'd') {
-            state.cursor.second = std::min(7, state.cursor.second + 1);
+            state.moveCursor(nchess::model::RIGHT);
         } else if (ch == 'm') {
             if (!state.currentMove) {
                 if (!nchess::validation::validateMoveBegin(state, state.cursor)) {
