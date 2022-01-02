@@ -192,7 +192,7 @@ bool nchess::validation::validateCastle(const nchess::model::State &state, const
     const model::Position signs = nchess::util::sign(delta);
     model::Position       pos   = nchess::util::sum(begin, signs);
     while (pos != end) {
-        if (state.pieceAt(pos) != model::NONE) { return false; }
+        if (state.pieceAt(pos).kind != model::NONE) { return false; }
         nchess::model::State newState(state);
         newState.movePiece(begin, pos);
         if (inCheck(newState)) {

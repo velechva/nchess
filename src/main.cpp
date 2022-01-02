@@ -16,13 +16,13 @@ int main() {
 
         if (ch == 'e') {
             nchess::ui::exit();
-        } else if (ch == 'w') {
+        } else if (ch == 'w' || ch == 'k') {
             state.moveCursor(nchess::model::MoveDirection::UP);
-        } else if (ch == 'a') {
+        } else if (ch == 'a' || ch == 'h') {
             state.moveCursor(nchess::model::MoveDirection::LEFT);
-        } else if (ch == 's') {
+        } else if (ch == 's' || ch == 'j') {
             state.moveCursor(nchess::model::MoveDirection::DOWN);
-        } else if (ch == 'd') {
+        } else if (ch == 'd' || ch == 'l') {
             state.moveCursor(nchess::model::MoveDirection::RIGHT);
         } else if (ch == 'm') {
             if (!state.currentMove) {
