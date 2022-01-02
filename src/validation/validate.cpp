@@ -194,6 +194,7 @@ bool nchess::validation::validateCastle(const nchess::model::State &state, const
     validateNoBlockingPieces(state, begin, end, delta);
     // No move along the way can put the King in check
     const nchess::model::Position sign = nchess::util::sign(delta);
+
 //    while() {
 //        newState.movePiece(begin, ...);
 //        if (inCheck(newState)) { return false; }
@@ -215,8 +216,11 @@ bool nchess::validation::validateKing(const nchess::model::State &state, const n
     return false;
 }
 
-bool nchess::validation::validatePawn(const nchess::model::State &state, const nchess::model::Position &begin,
-                  const nchess::model::Position &end) {
+bool nchess::validation::validatePawn(
+        const nchess::model::State &state,
+        const nchess::model::Position &begin,
+        const nchess::model::Position &end)
+{
     const nchess::model::Board &board = state.board;
 
     const nchess::model::Position delta = nchess::util::difference(begin, end);

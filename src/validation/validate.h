@@ -3,7 +3,7 @@
 
 #include <memory>
 
-#include "typevalidator.h"
+#include "../util.h"
 #include "../model/state.h"
 
 namespace nchess::validation {
