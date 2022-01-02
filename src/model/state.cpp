@@ -25,17 +25,33 @@ nchess::model::Board nchess::model::State::initialBoardState() {
     return board;
 }
 
+/**
+ * Promotes a pawn
+ * TODO allow the user to select a type to promote?
+ */
+void nchess::model::State::promotePawn(const Position & pos) {
+    pieceAt(pos).kind = QUEEN;
+}
+
+/**
+ * Check if a pawn should be promoted
+ */
+bool nchess::model::State::isPawnPromotion(const Position & end) {
+    Piece & p = pieceAt(end);
+    // Only pawns can be promoted
+    if (p.kind != PAWN) { return false; }
+    // Pawns are only promoted when they've advanced to the enemy home rank
+    return (( isWhiteTurn && end.first == 7) ||
+            (!isWhiteTurn && end.first == 0));
+}
+
 void nchess::model::State::movePiece(const Position &begin, const Position &end) {
     board[end.first][end.second] = board[begin.first][begin.second];
     board[end.first][end.second].movesMade++;
     board[begin.first][begin.second] = NONE;
 
-    // Pawn promotion TODO allow user to select a piece?
-    if (( isWhiteTurn && end.first == 7) ||
-        (!isWhiteTurn && end.first == 0))
-    {
-        Piece& p = pieceAt(end);
-        p.kind = QUEEN;
+    if (isPawnPromotion(end)) {
+        promotePawn(end);
     }
 }
 

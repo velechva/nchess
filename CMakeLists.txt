@@ -2,11 +2,14 @@ cmake_minimum_required(VERSION 3.20)
 project(nchess)
 
 set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_BUILD_TYPE Release)
 
 file(GLOB src "*.h" "*.cpp")
 
 find_package(Curses REQUIRED)
 include_directories(${CURSES_INCLUDE_DIR})
+
+set(CMAKE_COMPILER_FL)
 
 add_executable(main
         src/main.cpp

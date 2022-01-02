@@ -69,7 +69,7 @@ bool nchess::validation::inCheckMate(nchess::model::State &state) {
 
                     if (
                             destination.isWhite != state.isWhiteTurn &&
-                            destination.kind != nchess::model::NONE &&
+                            //destination.kind != nchess::model::NONE &&
                             validateMoveBegin(state, begin) &&
                             validateMoveEnd(state, begin, end, false)) {
                         nchess::model::State newState(state);

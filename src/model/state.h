@@ -54,6 +54,9 @@ namespace nchess::model {
         [[nodiscard]] Piece & pieceAt(const Position & p) {
             return board[p.first][p.second];
         }
+    private:
+        bool isPawnPromotion(const Position & end);
+        void promotePawn(const Position & pos);
     };
 }
 
