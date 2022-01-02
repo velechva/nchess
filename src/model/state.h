@@ -44,6 +44,7 @@ namespace nchess::model {
                 currentMove(std::optional(other.currentMove)) {}
 
         void movePiece(const Position &begin, const Position &end);
+        void swapPieces(const Position &begin, const Position &end);
 
         void moveCursor(const MoveDirection& dir);
 

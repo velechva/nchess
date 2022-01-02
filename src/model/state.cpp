@@ -48,11 +48,15 @@ bool nchess::model::State::isPawnPromotion(const Position & end) {
 void nchess::model::State::movePiece(const Position &begin, const Position &end) {
     board[end.first][end.second] = board[begin.first][begin.second];
     board[end.first][end.second].movesMade++;
-    board[begin.first][begin.second] = NONE;
+    board[begin.first][begin.second].kind = NONE;
 
     if (isPawnPromotion(end)) {
         promotePawn(end);
     }
+}
+
+void nchess::model::State::swapPieces(const Position &begin, const Position &end) {
+    std::swap(pieceAt(begin), pieceAt(end));
 }
 
 void nchess::model::State::moveCursor(const MoveDirection& dir) {

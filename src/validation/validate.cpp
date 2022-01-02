@@ -69,7 +69,6 @@ bool nchess::validation::inCheckMate(nchess::model::State &state) {
 
                     if (
                             destination.isWhite != state.isWhiteTurn &&
-                            //destination.kind != nchess::model::NONE &&
                             validateMoveBegin(state, begin) &&
                             validateMoveEnd(state, begin, end, false)) {
                         nchess::model::State newState(state);
@@ -123,14 +122,12 @@ bool nchess::validation::validateMoveEnd(const nchess::model::State &state, cons
 
 bool nchess::validation::validateNoBlockingPieces(const nchess::model::State &state, const nchess::model::Position &begin,
                               const nchess::model::Position &end, const nchess::model::Position &delta) {
-    const nchess::model::Position signs = nchess::util::sign(delta);
-    nchess::model::Position p = nchess::util::sum(begin, signs);
+    const nchess::model::Position dir = nchess::util::sign(delta);
+    nchess::model::Position       pos = nchess::util::sum(begin, dir);
 
-    while (p != end) {
-        if (state.pieceAt(p).kind != nchess::model::NONE) { return false; }
-
-        p.first += signs.first;
-        p.second += signs.second;
+    while (pos != end) {
+        if (state.pieceAt(pos).kind != nchess::model::NONE) { return false; }
+        pos = nchess::util::sum(pos, dir);
     }
 
     return true;
@@ -190,15 +187,18 @@ bool nchess::validation::validateCastle(const nchess::model::State &state, const
     nchess::model::State newState(state);
     if (nchess::validation::inCheck(newState)) { return false; }
     // No pieces can be in the way
-    const nchess::model::Position delta = nchess::util::difference(begin, end);
-    validateNoBlockingPieces(state, begin, end, delta);
-    // No move along the way can put the King in check
-    const nchess::model::Position sign = nchess::util::sign(delta);
-
-//    while() {
-//        newState.movePiece(begin, ...);
-//        if (inCheck(newState)) { return false; }
-//    }
+    // No space along the way can be non-empty OR put the King in check
+    const model::Position delta = nchess::util::difference(begin, end);
+    const model::Position signs = nchess::util::sign(delta);
+    model::Position       pos   = nchess::util::sum(begin, signs);
+    while (pos != end) {
+        if (state.pieceAt(pos) != model::NONE) { return false; }
+        nchess::model::State newState(state);
+        newState.movePiece(begin, pos);
+        if (inCheck(newState)) {
+            return false;
+        }
+    }
 
     return true;
 }
