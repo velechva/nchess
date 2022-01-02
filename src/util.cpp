@@ -1,5 +1,12 @@
 #include "util.h"
 
+/**
+ * Iterate with two pointers that represent the beginning and end
+ * of the current token substring. Once a delimiter is hit,
+ * push the current substring onto the stack (if it's non-empty)
+ * otherwise keep moving forward. If the current character is not the delimiter,
+ * increase the size of the current token substring
+ */
 std::vector<std::string> nchess::util::split(const std::string &str, const char &delimiter) {
     std::vector<std::string> output;
 

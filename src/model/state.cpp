@@ -9,9 +9,6 @@ nchess::model::Board nchess::model::State::initialBoardState() {
         nchess::file::read_csv("/Users/victorvelechosky/CLionProjects/nchess/res/board.txt"),
         "Failed to load board config");
 
-    size_t i = 0;
-    size_t j = 0;
-
     for (auto& line: boardFile) {
         std::vector<Piece> row;
 
@@ -30,7 +27,16 @@ nchess::model::Board nchess::model::State::initialBoardState() {
 
 void nchess::model::State::movePiece(const Position &begin, const Position &end) {
     board[end.first][end.second] = board[begin.first][begin.second];
+    board[end.first][end.second].movesMade++;
     board[begin.first][begin.second] = NONE;
+
+    // Pawn promotion TODO allow user to select a piece?
+    if (( isWhiteTurn && end.first == 7) ||
+        (!isWhiteTurn && end.first == 0))
+    {
+        Piece& p = pieceAt(end);
+        p.kind = QUEEN;
+    }
 }
 
 void nchess::model::State::moveCursor(const MoveDirection& dir) {

@@ -28,6 +28,7 @@ namespace nchess::model {
     struct Piece {
         Type kind;
         bool isWhite;
+        int movesMade = 0;
 
         Piece(Type _kind, bool _isWhite) : kind(_kind), isWhite(_isWhite) {}
 

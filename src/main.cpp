@@ -1,4 +1,3 @@
-#include <algorithm>
 #include <optional>
 
 #include "ui.h"
@@ -18,13 +17,13 @@ int main() {
         if (ch == 'e') {
             nchess::ui::exit();
         } else if (ch == 'w') {
-            state.moveCursor(nchess::model::UP);
+            state.moveCursor(nchess::model::MoveDirection::UP);
         } else if (ch == 'a') {
-            state.moveCursor(nchess::model::LEFT);
+            state.moveCursor(nchess::model::MoveDirection::LEFT);
         } else if (ch == 's') {
-            state.moveCursor(nchess::model::DOWN);
+            state.moveCursor(nchess::model::MoveDirection::DOWN);
         } else if (ch == 'd') {
-            state.moveCursor(nchess::model::RIGHT);
+            state.moveCursor(nchess::model::MoveDirection::RIGHT);
         } else if (ch == 'm') {
             if (!state.currentMove) {
                 if (!nchess::validation::validateMoveBegin(state, state.cursor)) {

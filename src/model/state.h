@@ -50,6 +50,10 @@ namespace nchess::model {
         [[nodiscard]] const Piece & pieceAt(const Position & p) const {
             return board[p.first][p.second];
         }
+
+        [[nodiscard]] Piece & pieceAt(const Position & p) {
+            return board[p.first][p.second];
+        }
     };
 }
 
