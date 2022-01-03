@@ -4,51 +4,69 @@
 #include "validation/validate.h"
 #include "model/state.h"
 
+using namespace nchess;
+
+void handleCheckmateCondition(const model::State& state) {
+    model::State newState(state);
+    if (validation::inCheckMate(newState)) {
+        ui::printWinner(!state.isWhiteTurn);
+        ui::getChar();
+        ui::exit();
+    }
+}
+
+void handleMove(model::State& state) {
+    if (!state.currentMove) {
+        if (!validation::validateMoveBegin(state, state.cursor)) {
+            ui::printError(state, "Invalid move");
+        } else {
+            state.currentMove = state.cursor;
+        }
+    } else {
+        if (validation::validateCastle(state, state.currentMove.value(), state.cursor)) {
+            state.swapPieces(state.currentMove.value(), state.cursor);
+        }
+        else if(validation::validateMoveEnd(state, state.currentMove.value(), state.cursor, true)) {
+            state.movePiece(state.currentMove.value(), state.cursor);
+        }
+        else {
+            ui::printError(state, "Invalid move");
+            state.currentMove = std::nullopt;
+            return;
+        }
+
+        state.changePlayer();
+        handleCheckmateCondition(state);
+
+        state.currentMove = std::nullopt;
+    }
+}
+
 int main() {
-    nchess::ui::initialize();
-    nchess::model::State state;
-    nchess::ui::refresh(state);
+    model::State state;
+
+    ui::initialize();
+    ui::refresh(state);
 
     char ch = ' ';
 
     while (ch != 'e') {
-        ch = nchess::ui::getChar();
+        ch = ui::getChar();
 
         if (ch == 'e') {
-            nchess::ui::exit();
+            ui::exit();
         } else if (ch == 'w' || ch == 'k') {
-            state.moveCursor(nchess::model::MoveDirection::UP);
+            state.moveCursor(model::DELTA_UP);
         } else if (ch == 'a' || ch == 'h') {
-            state.moveCursor(nchess::model::MoveDirection::LEFT);
+            state.moveCursor(model::DELTA_LEFT);
         } else if (ch == 's' || ch == 'j') {
-            state.moveCursor(nchess::model::MoveDirection::DOWN);
+            state.moveCursor(model::DELTA_DOWN);
         } else if (ch == 'd' || ch == 'l') {
-            state.moveCursor(nchess::model::MoveDirection::RIGHT);
+            state.moveCursor(model::DELTA_RIGHT);
         } else if (ch == 'm') {
-            if (!state.currentMove) {
-                if (!nchess::validation::validateMoveBegin(state, state.cursor)) {
-                    nchess::ui::printError(state, "Invalid move");
-                } else {
-                    state.currentMove = state.cursor;
-                }
-            } else {
-                if (!nchess::validation::validateMoveEnd(state, state.currentMove.value(), state.cursor, true)) {
-                    nchess::ui::printError(state, "Invalid move");
-                } else {
-                    state.movePiece(state.currentMove.value(), state.cursor);
-                    state.isWhiteTurn = !state.isWhiteTurn;
-
-                    nchess::model::State newState(state);
-                    if (nchess::validation::inCheckMate(newState)) {
-                        nchess::ui::printWinner(!state.isWhiteTurn);
-                        nchess::ui::getChar();
-                        nchess::ui::exit();
-                    }
-                }
-                state.currentMove = std::nullopt;
-            }
+            handleMove(state);
         }
-        nchess::ui::refresh(state);
+        ui::refresh(state);
     }
-    nchess::ui::exit();
+    ui::exit();
 }

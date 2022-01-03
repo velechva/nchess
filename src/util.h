@@ -14,7 +14,7 @@ namespace nchess::util {
      * @return val < 0 ? -1 : 1
      */
     template<typename T>
-    int sign(T val) {
+    inline int sign(T val) {
         if (val < 0) { return -1; }
         if (val > 0) { return  1; }
 
@@ -25,7 +25,7 @@ namespace nchess::util {
      * Apply Sign function to both parameters in a pair
      */
     template<typename T>
-    std::pair<T, T> sign(const std::pair<T, T>& pair) {
+    inline std::pair<T, T> sign(const std::pair<T, T>& pair) {
         return {
                 sign(pair.first),
                 sign(pair.second)
@@ -44,7 +44,7 @@ namespace nchess::util {
      * @return end - begin
      */
     template<typename T>
-    std::pair<T, T> difference(const std::pair<T, T> &begin, const std::pair<T, T> &end) {
+    inline std::pair<T, T> difference(const std::pair<T, T> &begin, const std::pair<T, T> &end) {
         return {
                 end.first  - begin.first,
                 end.second - begin.second
@@ -56,7 +56,7 @@ namespace nchess::util {
      * @return begin + end
      */
      template<typename T>
-     std::pair<T, T> sum(const std::pair<T, T>& begin, const std::pair<T, T> &end) {
+     inline std::pair<T, T> sum(const std::pair<T, T>& begin, const std::pair<T, T> &end) {
         return {
                 end.first  + begin.first,
                 end.second + begin.second
@@ -64,14 +64,13 @@ namespace nchess::util {
      }
 
      template<typename T>
-     T unwrapOrExit(std::optional<T> opt, const char * exitMessage) {
+     inline T unwrapOrExit(std::optional<T> opt, const char * exitMessage) {
          if (opt) {
              return opt.value();
          }
-         else {
-             nchess::log::debug << exitMessage << "\n";
-             exit(1);
-         }
+
+         nchess::log::error << exitMessage << "\n";
+         exit(1);
      }
 }
 

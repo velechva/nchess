@@ -12,21 +12,21 @@ static std::vector<nchess::model::Position> KING_DELTAS = {
 };
 
 bool nchess::validation::inCheck(nchess::model::State &state) {
-    state.isWhiteTurn = !state.isWhiteTurn;
+    state.changePlayer();;
 
     const nchess::model::Board &board = state.board;
 
     for (size_t i1 = 0; i1 < board.size(); i1++) {
-        for (int j1 = 0; j1 < board.size(); j1++) {
+        for (size_t j1 = 0; j1 < board.size(); j1++) {
             const nchess::model::Piece &piece = board[i1][j1];
 
             if (piece.kind == nchess::model::NONE || piece.isWhite != state.isWhiteTurn) { continue; }
 
-            for (int i2 = 0; i2 < board.size(); i2++) {
-                for (int j2 = 0; j2 < board.size(); j2++) {
+            for (size_t i2 = 0; i2 < board.size(); i2++) {
+                for (size_t j2 = 0; j2 < board.size(); j2++) {
                     // For each of the opposing players possible moves,
                     // if the move is valid and takes the current players king,
-                    // this is a valid-checkable move
+                    // this is a valid check-able move
                     const nchess::model::Piece &destination = board[i2][j2];
 
                     const nchess::model::Position begin = {i1, j1};
@@ -49,19 +49,19 @@ bool nchess::validation::inCheck(nchess::model::State &state) {
 bool nchess::validation::inCheckMate(nchess::model::State &state) {
     if (!nchess::validation::inCheck(state)) { return false; }
 
-    state.isWhiteTurn = !state.isWhiteTurn;
+    state.changePlayer();;
 
     const nchess::model::Board &board = state.board;
 
-    for (int i1 = 0; i1 < board.size(); i1++) {
-        for (int j1 = 0; j1 < board.size(); j1++) {
+    for (size_t i1 = 0; i1 < board.size(); i1++) {
+        for (size_t j1 = 0; j1 < board.size(); j1++) {
             const nchess::model::Piece &piece = board[i1][j1];
 
             if (piece.kind == nchess::model::NONE || piece.isWhite != state.isWhiteTurn ||
                 !validateMoveBegin(state, {i1, j1})) { continue; }
 
-            for (int i2 = 0; i2 < board.size(); i2++) {
-                for (int j2 = 0; j2 < board.size(); j2++) {
+            for (size_t i2 = 0; i2 < board.size(); i2++) {
+                for (size_t j2 = 0; j2 < board.size(); j2++) {
                     const nchess::model::Piece &destination = board[i2][j2];
 
                     const nchess::model::Position begin = {i1, j1};
@@ -172,8 +172,11 @@ bool nchess::validation::validateQueen(const nchess::model::State &state, const 
     return nchess::validation::validateRook(state, begin, end) || nchess::validation::validateBishop(state, begin, end);
 }
 
-bool nchess::validation::validateCastle(const nchess::model::State &state, const nchess::model::Position &begin,
-                    const nchess::model::Position& end) {
+bool nchess::validation::validateCastle(
+        const nchess::model::State &state,
+        const nchess::model::Position &begin,
+        const nchess::model::Position& end)
+{
     const nchess::model::Piece& pBegin = state.pieceAt(begin);
     const nchess::model::Piece& pEnd   = state.pieceAt(end);
 
@@ -203,15 +206,16 @@ bool nchess::validation::validateCastle(const nchess::model::State &state, const
     return true;
 }
 
-bool nchess::validation::validateKing(const nchess::model::State &state, const nchess::model::Position &begin,
-                  const nchess::model::Position &end) {
+bool nchess::validation::validateKing(
+        const nchess::model::State &state,
+        const nchess::model::Position &begin,
+        const nchess::model::Position &end)
+{
     nchess::model::Position delta = nchess::util::difference(begin, end);
 
     for (auto &allowed: KING_DELTAS) {
         if (allowed == delta) { return true; }
     }
-
-    if (nchess::validation::validateCastle(state, begin, end)) { return true; }
 
     return false;
 }
@@ -237,7 +241,7 @@ bool nchess::validation::validatePawn(
         return true;
     }
 
-        // Pawn moves forward once
+    // Pawn moves forward once
     else if (
             delta.first == direction &&
             delta.second == 0 &&
@@ -246,7 +250,7 @@ bool nchess::validation::validatePawn(
         return true;
     }
 
-        // Pawn moves forward twice
+    // Pawn moves forward twice
     else if (
             ((state.isWhiteTurn && begin.first == 1) || (!state.isWhiteTurn && begin.first == 6)) &&
             delta.first == 2 * direction &&

@@ -59,9 +59,7 @@ void nchess::model::State::swapPieces(const Position &begin, const Position &end
     std::swap(pieceAt(begin), pieceAt(end));
 }
 
-void nchess::model::State::moveCursor(const MoveDirection& dir) {
-    const Position & delta = MOVE_DIRECTION_MAP[dir];
-
-    cursor.first  = std::clamp(cursor.first + delta.first, 0, 7);
-    cursor.second = std::clamp(cursor.second + delta.second, 0, 7);
+void nchess::model::State::moveCursor(const Position & dir) {
+    cursor.first  = std::clamp(cursor.first + dir.first, 0, 7);
+    cursor.second = std::clamp(cursor.second + dir.second, 0, 7);
 }

@@ -11,16 +11,10 @@
 namespace nchess::model {
     typedef std::vector<std::vector<Piece>> Board;
 
-    enum MoveDirection {
-        UP, DOWN, LEFT, RIGHT
-    };
-
-    static std::unordered_map<MoveDirection, Position> MOVE_DIRECTION_MAP = {
-        { UP,       {  -1, 0 }},
-        { DOWN,     {  1, 0 }},
-        { LEFT,     { 0, -1 }},
-        { RIGHT,    {  0, 1 }}
-    };
+    static Position DELTA_UP    = { -1,  0 };
+    static Position DELTA_DOWN  = {  1,  0 };
+    static Position DELTA_LEFT  = {  0, -1 };
+    static Position DELTA_RIGHT = {  0, -1 };
 
     struct State {
     public:
@@ -28,6 +22,7 @@ namespace nchess::model {
         bool isWhiteTurn;
         Position cursor;
         std::optional<Position> currentMove;
+        std::vector<Position> moves;
 
         Board initialBoardState();
 
@@ -37,16 +32,12 @@ namespace nchess::model {
                 cursor{0, 0},
                 currentMove(std::nullopt) {}
 
-        State(const State & other) :
-                board(Board(other.board)),
-                isWhiteTurn(other.isWhiteTurn),
-                cursor(Position(other.cursor)),
-                currentMove(std::optional(other.currentMove)) {}
+        void changePlayer() { isWhiteTurn = !isWhiteTurn; }
 
         void movePiece(const Position &begin, const Position &end);
         void swapPieces(const Position &begin, const Position &end);
 
-        void moveCursor(const MoveDirection& dir);
+        void moveCursor(const Position & dir);
 
         [[nodiscard]] const Piece & pieceAt(const Position & p) const {
             return board[p.first][p.second];
