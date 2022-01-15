@@ -25,6 +25,7 @@ add_executable(main
         src/ui/ui.h
         src/ui/ui.cpp
         src/validation/validate.h
-        src/validation/validate.cpp)
+        src/validation/validate.cpp
+        src/ui/colors.h)
 
 target_link_libraries(main ${CURSES_LIBRARIES})

@@ -11,10 +11,11 @@ namespace nchess::ui {
 
     /* Printing */
     void printControls();
+    void printPiece(const model::Piece& piece);
     void printWinner(const bool winnerIsWhite);
     void printMessage(const char *str);
-    void printError(const nchess::model::State &state, const char *str);
-    void printBoard(const nchess::model::State &state);
+    void printError(const model::State &state, const char *str);
+    void printBoard(const model::State &state);
 
     char getChar();
 }

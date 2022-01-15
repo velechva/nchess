@@ -1,17 +1,7 @@
 #include <ncurses.h>
 
 #include "ui.h"
-
-void setupColors() {
-    if (has_colors() == FALSE) {
-        printf("Terminal does not support colors.");
-        exit(1);
-    }
-
-    start_color();
-    init_pair(1, COLOR_WHITE, COLOR_BLACK);
-    init_pair(2, COLOR_BLUE, COLOR_BLACK);
-}
+#include "colors.h"
 
 void nchess::ui::initialize() {
     initscr();
@@ -21,7 +11,7 @@ void nchess::ui::initialize() {
 }
 
 void nchess::ui::printControls() {
-    printw("w: up, a: left, s: down, d: right, m: move, e: exit\n");
+    print("w: up, a: left, s: down, d: right, m: move, e: exit\n");
 }
 
 void nchess::ui::printError(const model::State &state, const char *str) {
@@ -54,30 +44,30 @@ void nchess::ui::printWinner(const bool winnerIsWhite) {
 
 void nchess::ui::printMessage(const char *str) {
     move(12, 0);
-    printw(str);
+    print(str);
     ::refresh();
+}
+
+void nchess::ui::printPiece(const nchess::model::Piece& piece) {
+    if (piece.kind == model::NONE) {
+        nchess::ui::print("-");
+    } else if (piece.isWhite) {
+        print(piece.toString(), CYAN);
+    } else {
+        print(piece.toString(), BLUE);
+    }
 }
 
 void nchess::ui::printBoard(const model::State &state) {
     auto board = state.board;
 
-    for (auto &i: board) {
-        for (auto &j: i) {
-            if (j.kind == model::NONE) {
-                printw("-");
-            } else if (j.isWhite) {
-                attron(COLOR_PAIR(1));
-                printw(j.toString());
-                attroff(COLOR_PAIR(1));
-            } else {
-                attron(COLOR_PAIR(2));
-                printw(j.toString());
-                attroff(COLOR_PAIR(2));
-            }
+    for (auto &rank: board) {
+        for (auto &piece: rank) {
+            printPiece(piece);
         }
-        printw("\n");
+        print("\n");
     }
-    printw("\n\n");
+    print("\n\n");
 }
 
 char nchess::ui::getChar() {
