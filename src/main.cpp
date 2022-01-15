@@ -55,13 +55,13 @@ int main() {
 
         if (ch == 'e') {
             ui::exit();
-        } else if (ch == 'w' || ch == 'k') {
+        } else if (ch == 'w') {
             state.moveCursor(model::DELTA_UP);
-        } else if (ch == 'a' || ch == 'h') {
+        } else if (ch == 'a') {
             state.moveCursor(model::DELTA_LEFT);
-        } else if (ch == 's' || ch == 'j') {
+        } else if (ch == 's') {
             state.moveCursor(model::DELTA_DOWN);
-        } else if (ch == 'd' || ch == 'l') {
+        } else if (ch == 'd') {
             state.moveCursor(model::DELTA_RIGHT);
         } else if (ch == 'm') {
             handleMove(state);

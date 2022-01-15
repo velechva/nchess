@@ -14,7 +14,7 @@ namespace nchess::model {
     static Position DELTA_UP    = { -1,  0 };
     static Position DELTA_DOWN  = {  1,  0 };
     static Position DELTA_LEFT  = {  0, -1 };
-    static Position DELTA_RIGHT = {  0, -1 };
+    static Position DELTA_RIGHT = {  0,  1 };
 
     struct State {
     public:
