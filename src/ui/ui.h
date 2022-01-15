@@ -1,7 +1,7 @@
 #ifndef NCHESS_UI_H
 #define NCHESS_UI_H
 
-#include "model/state.h"
+#include "../model/state.h"
 
 namespace nchess::ui {
     /* Application lifecycle */

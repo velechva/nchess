@@ -22,8 +22,8 @@ add_executable(main
         src/model/piece.h
         src/model/state.h
         src/model/state.cpp
-        src/ui.h
-        src/ui.cpp
+        src/ui/ui.h
+        src/ui/ui.cpp
         src/validation/validate.h
         src/validation/validate.cpp)
 
