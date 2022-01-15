@@ -14,6 +14,15 @@ void nchess::ui::printControls() {
     print("w: up, a: left, s: down, d: right, m: move, e: exit\n");
 }
 
+void nchess::ui::printCurrentPlayer(const model::State &state) {
+    if (state.isWhiteTurn) {
+        print("White turn\n", CYAN);
+    }
+    else {
+        print("Black turn\n", BLUE);
+    }
+}
+
 void nchess::ui::printError(const model::State &state, const char *str) {
     printMessage(str);
     move(state.cursor.first, state.cursor.second);
@@ -24,6 +33,7 @@ void nchess::ui::refresh(const model::State &state) {
     clear();
     printBoard(state);
     printControls();
+    printCurrentPlayer(state);
     ::refresh();
     move(state.cursor.first, state.cursor.second);
 }

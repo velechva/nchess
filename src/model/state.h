@@ -32,6 +32,13 @@ namespace nchess::model {
                 cursor{0, 0},
                 currentMove(std::nullopt) {}
 
+        State(const State& other) :
+                board(other.board),
+                isWhiteTurn(other.isWhiteTurn),
+                cursor(other.cursor),
+                currentMove(other.currentMove),
+                moves(other.moves) {}
+
         void changePlayer() { isWhiteTurn = !isWhiteTurn; }
 
         void movePiece(const Position &begin, const Position &end);

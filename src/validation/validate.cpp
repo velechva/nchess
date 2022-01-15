@@ -12,15 +12,15 @@ static std::vector<nchess::model::Position> KING_DELTAS = {
 };
 
 bool nchess::validation::inCheck(nchess::model::State &state) {
-    state.changePlayer();;
+    state.changePlayer();
 
     const nchess::model::Board &board = state.board;
 
     for (size_t i1 = 0; i1 < board.size(); i1++) {
         for (size_t j1 = 0; j1 < board.size(); j1++) {
-            const nchess::model::Piece &piece = board[i1][j1];
+            const nchess::model::Position begin = {i1, j1};
 
-            if (piece.kind == nchess::model::NONE || piece.isWhite != state.isWhiteTurn) { continue; }
+            if (!validateMoveBegin(state, begin)) { continue; }
 
             for (size_t i2 = 0; i2 < board.size(); i2++) {
                 for (size_t j2 = 0; j2 < board.size(); j2++) {
@@ -28,14 +28,11 @@ bool nchess::validation::inCheck(nchess::model::State &state) {
                     // if the move is valid and takes the current players king,
                     // this is a valid check-able move
                     const nchess::model::Piece &destination = board[i2][j2];
-
-                    const nchess::model::Position begin = {i1, j1};
                     const nchess::model::Position end = {i2, j2};
 
                     if (
                             destination.isWhite != state.isWhiteTurn &&
                             destination.kind == nchess::model::KING &&
-                            validateMoveBegin(state, begin) &&
                             validateMoveEnd(state, begin, end, false)) {
                         return true;
                     }
@@ -47,36 +44,27 @@ bool nchess::validation::inCheck(nchess::model::State &state) {
 }
 
 bool nchess::validation::inCheckMate(nchess::model::State &state) {
-    if (!nchess::validation::inCheck(state)) { return false; }
+    if (!inCheck(state)) { return false; }
 
-    state.changePlayer();;
+    state.changePlayer();
 
     const nchess::model::Board &board = state.board;
 
     for (size_t i1 = 0; i1 < board.size(); i1++) {
         for (size_t j1 = 0; j1 < board.size(); j1++) {
-            const nchess::model::Piece &piece = board[i1][j1];
+            const nchess::model::Position begin = {i1, j1};
 
-            if (piece.kind == nchess::model::NONE || piece.isWhite != state.isWhiteTurn ||
-                !validateMoveBegin(state, {i1, j1})) { continue; }
+            if (!validateMoveBegin(state, begin)) { continue; }
 
             for (size_t i2 = 0; i2 < board.size(); i2++) {
                 for (size_t j2 = 0; j2 < board.size(); j2++) {
                     const nchess::model::Piece &destination = board[i2][j2];
-
-                    const nchess::model::Position begin = {i1, j1};
                     const nchess::model::Position end = {i2, j2};
 
-                    if (
-                            destination.isWhite != state.isWhiteTurn &&
-                            validateMoveBegin(state, begin) &&
-                            validateMoveEnd(state, begin, end, false)) {
-                        nchess::model::State newState(state);
-                        newState.movePiece(begin, end);
-
-                        if (!inCheck(newState)) {
-                            return false;
-                        }
+                    // For every valid move I can make, if it puts me out of check
+                    // then I am not yet in checkmate
+                    if (validateMoveEnd(state, begin, end, true)) {
+                        return false;
                     }
                 }
             }

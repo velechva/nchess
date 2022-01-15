@@ -11,7 +11,7 @@ include_directories(${CURSES_INCLUDE_DIR})
 
 set(CMAKE_COMPILER_FL)
 
-add_executable(main
+add_executable(nchess
         src/main.cpp
         src/util.h
         src/util.cpp
@@ -28,4 +28,4 @@ add_executable(main
         src/validation/validate.cpp
         src/ui/colors.h)
 
-target_link_libraries(main ${CURSES_LIBRARIES})
+target_link_libraries(nchess ${CURSES_LIBRARIES})

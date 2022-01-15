@@ -33,22 +33,14 @@ namespace nchess::ui {
         init_pair(COLOR_WHITE, COLOR_WHITE, COLOR_BLACK);
     }
 
-    void colorOn(COLOR_CODE code) {
-       attron(COLOR_PAIR(code));
-    }
-
-    void colorOff(COLOR_CODE code) {
-        attroff(COLOR_PAIR(code));
-    }
-
     void print(const char * msg) {
         printw(msg);
     }
 
     void print(const char * msg, COLOR_CODE color) {
-        colorOn(color);
+        attron(COLOR_PAIR(color));
         printw(msg);
-        colorOff(color);
+        attroff(COLOR_PAIR(color));
     }
 }
 

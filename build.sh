@@ -1,1 +1,1 @@
-cmake --build /Users/victorvelechosky/CLionProjects/nchess/cmake-build-debug --target all -- -j 9
+cmake --build ./cmake-build-debug --target all -- -j 9

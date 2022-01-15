@@ -1,1 +1,1 @@
-./cmake-build-debug/main
+./cmake-build-debug/nchess

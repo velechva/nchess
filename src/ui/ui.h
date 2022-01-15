@@ -11,6 +11,7 @@ namespace nchess::ui {
 
     /* Printing */
     void printControls();
+    void printCurrentPlayer(const model::State& state);
     void printPiece(const model::Piece& piece);
     void printWinner(const bool winnerIsWhite);
     void printMessage(const char *str);
