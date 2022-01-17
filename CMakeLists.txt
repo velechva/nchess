@@ -26,6 +26,7 @@ add_executable(nchess
         src/ui/ui.cpp
         src/validation/validate.h
         src/validation/validate.cpp
-        src/ui/colors.h)
+        src/ui/colors.h
+        src/env.h src/env.cpp)
 
 target_link_libraries(nchess ${CURSES_LIBRARIES})

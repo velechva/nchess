@@ -3,7 +3,6 @@
 
 #include <vector>
 #include <iostream>
-#include <stdlib.h>
 
 #include "piece.h"
 #include "types.h"

@@ -1,12 +1,12 @@
 #include "state.h"
-
+#include "../env.h"
 #include "../file.h"
 
 nchess::model::Board nchess::model::State::initialBoardState() {
     Board board;
 
     const auto boardFile = nchess::util::unwrapOrExit(
-        nchess::file::read_csv("/Users/victorvelechosky/CLionProjects/nchess/res/board.txt"),
+        nchess::file::read_csv(std::string(nchess::env::E_HOME) + "/CLionProjects/nchess/res/board.txt"),
         "Failed to load board config");
 
     for (auto& line: boardFile) {
